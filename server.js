@@ -37,10 +37,6 @@ function jsonError(res, message) {
   res.json({ status: 'error', message });
 }
 
-// app.get('/', (req, res) => {
-//   res.json({ wow: 'it works!' });
-// });
-
 // GET: '/api/page/:slug'
 // success response: {status: 'ok', body: '<file contents>'}
 // failure response: {status: 'error', message: 'Page does not exist.'}
