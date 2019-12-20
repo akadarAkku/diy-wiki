@@ -14,15 +14,17 @@ app.use(express.static(path.join(__dirname, 'client', 'build')));
 
 // some helper functions you can use
 async function readFile(filePath) {
+  const readFile = util.promisify(fs.readFile);
   return await fs.readFile(filePath, 'utf-8');
 }
 async function writeFile(filePath) {
+const writeFile = util.promisify(fs.writeFile);
   return await fs.writeFile(filePath, 'utf-8');
 }
 async function readDir(dirPath) {
+const readDir = util.promisify(fs.readdir);
   return await fs.readDir(dirPath);
 }
-
 // some more helper functions
 const DATA_DIR = 'data';
 const TAG_RE = /#\w+/g;
@@ -38,15 +40,22 @@ function jsonError(res, message) {
 }
 
 // GET: '/api/page/:slug'
-// success response: {status: 'ok', body: '<file contents>'}
-// failure response: {status: 'error', message: 'Page does not exist.'}
 app.get('/api/page/:slug', async (req, res) => {
-  res.json({status: 'ok', body: 'Welcome!'});
+try {
+var filePath = await slugToPath(req.params.slug);
+console.log(filePath)
+ var body = await readFile(filePath);
+await res.json({ status: 'ok', body });
+}
+catch {
+await res.status(404).json({ message : 'Page does not exist.'}); 
+}
 });
+
 // POST: '/api/page/:slug'
-// body: {body: '<file text content>'}
-// success response: {status: 'ok'}
-// failure response: {status: 'error', message: 'Could not write page.'}
+app.post('/api/page/:slug', async (req, res) => {
+  res.json({status: 'ok', body: 'Edit me! '});
+});
 
 // GET: './wiki-server/data/all'
 // success response: {status:'ok', pages: ['fileName', 'otherFileName']}
