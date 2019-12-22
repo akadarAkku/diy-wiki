@@ -41,22 +41,27 @@ function jsonError(res, message) {
 
 // GET: '/api/page/:slug'
 app.get('/api/page/:slug', async (req, res) => {
-try {
-var filePath = await slugToPath(req.params.slug);
-console.log(filePath)
- var body = await readFile(filePath);
-await res.json({ status: 'ok', body });
-}
-catch {
-await res.status(404).json({ message : 'Page does not exist.'}); 
-}
+  const filename = `${req.params.slug}`;
+  const fullFilename = path.join(DATA_DIR, filename);
+  try {
+    const text = await readFile(fullFilename);
+    res.json({ status: 'ok', body: text });
+  } catch {
+    res.json({ status: 'error', message: 'Page does not exist.' });
+  }
 });
 
 // POST: '/api/page/:slug'
 app.post('/api/page/:slug', async (req, res) => {
-  res.json({status: 'ok', body: 'Edit me! '});
-});
-
+  const filePath = path.join('data',`${req.params.slug}.md`);
+  const text= req.body.body;
+ try{
+   fs.writeFile(filePath, text);
+   res.json({status: 'ok'});
+ }catch(e){
+   res.json({status: 'error', message: 'could not write page. please try again later.'});
+ }
+})
 // GET: './wiki-server/data/all'
 // success response: {status:'ok', pages: ['fileName', 'otherFileName']}
 //  file names do not have .md, just the name!
